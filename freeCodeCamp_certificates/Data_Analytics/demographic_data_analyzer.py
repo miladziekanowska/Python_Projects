@@ -40,8 +40,7 @@ def calculate_demographic_data(print_data=True):
     rich_percentage = {}
 
     for country in countries:
-        rich_percentage[country] = len(df_rich[df_rich['native-country'] == country]) \
-                                       / len(df[df['native-country'] == country])
+        rich_percentage[country] = len(df_rich[df_rich['native-country'] == country]) / len(df[df['native-country'] == country])
 
     highest_earning_country_percentage = max(list(rich_percentage.values()))
     highest_earning_country = next(
