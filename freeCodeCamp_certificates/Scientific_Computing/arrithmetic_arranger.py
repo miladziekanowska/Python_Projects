@@ -1,74 +1,54 @@
-def arithmetic_arranger(problems: list, solve = False):
+import re
+
+def arithmetic_arranger(problems, calculate=False):
+    # error for to many problems
     if len(problems) > 5:
         return "Error: Too many problems."
+    
+    # preparing initial variables
+    rex = re.compile(r'^[0-9]{1,4}$')
+    possible_operators = ["+", "-"]
+    formated = []
 
-    first_value = []
-    second_value = []
-    operator = []
-    lengths = []
-    separator_len = []
-    separator = []
-    result = []
+    # creating a string formatting function for final result
+    def format(first, operator, second, calculate):
+        x = int(first)
+        y = int(second)
+        r = x + y if operator == '+' else x - y
+        base = r if r > 0 else 0 - r
+        n = max([len(first), len(second), len(str(base))]) if calculate else max(
+          [len(first), len(second)])
 
-    for operation in problems:
-        first_value.append(operation.split(" ")[0])
-        operator.append(operation.split(" ")[1])
-        second_value.append(operation.split(" ")[2])
+        r = str(r)
+        n += 2  # for the op and a space
+        res = [first.rjust(n), operator + " " + second.rjust(n - 2), '-' * n]
+        if calculate:
+              res.append(r.rjust(n))
+        return res
 
-    for i in first_value:
-        if len(i) > 4:
-            print("Error: Numbers cannot be more than four digits.")
+    # assigning the variables for the arguments in the problem
+    for problem in problems:
+        [first, operator, second] = problem.split()
 
-    for i in second_value:
-        if len(i) > 4:
-            print("Error: Numbers cannot be more than four digits.")
+        if operator not in possible_operators:
+              return "Error: Operator must be '+' or '-'."
 
-    for i in operator:
-        if i == "+" or i == "-":
-            continue
-        else:
-            print("Error: Operator must be '+' or '-'.")
+        if rex.match(first) is None or rex.match(second) is None:
+              return "Error: Numbers must only contain digits."
 
-    for i in first_value:
-        try:
-            i = int(i)
-        except:
-            print("Error: Numbers must only contain digits.")
+        if len(first) > 4 or len(second) > 4:
+              return "Error: Numbers cannot be more than four digits."
 
-    for i in second_value:
-        try:
-            i = int(i)
-        except:
-            print("Error: Numbers must only contain digits.")
+        formated.append(format(first, operator, second, calculate))
 
-    for v in range(0, len(first_value)):
-        if operator[v] == "+":
-            result.append(str(int(first_value[v]) + int(second_value[v])))
-            lengths.append((len(first_value[v]), len(second_value[v])))
-            separator_len.append(max(lengths[v]) + 2)
-            separator.append("-" * separator_len[v])
-        else:
-            result.append(str(int(first_value[v]) - int(second_value[v])))
-            lengths.append((len(first_value[v]), len(second_value[v])))
-            separator_len.append(max(lengths[v]) + 2)
-            separator.append("-" * separator_len[v])
+    # final formatting
+    ff = formated[0]
+    spaces = " " * 4
+    for p in formated[1:]:
+        for i in range(0, len(ff)):
+            ff[i] += spaces + p[i]
+            
+    if not calculate:
+        ff = ff[0:3]
 
-    for v in range(0, len(first_value)):
-        if v != len(first_value) - 1:
-            top = first_value[v].rjust(separator_len[v] + 1) + "    "
-            middle = operator[v] + second_value[v].rjust(separator_len[v] - 1) + "    "
-            line = separator[v] + "    "
-            bottom = result[v].rjust(separator_len[v]) + "    "
-        else:
-            top = first_value[v].rjust(separator_len[v] + 1)
-            middle = operator[v] + second_value[v].rjust(separator_len[v] - 1)
-            line = separator[v]
-            bottom = result[v].rjust(separator_len[v])
-
-
-
-    print(first_value)
-    print(operator)
-    print(second_value)
-    print(result)
-    print(separator)
+    return '\n'.join(ff)
